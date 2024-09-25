@@ -2,13 +2,24 @@ from models import *
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
-import pika
+import pika,logging
 import json
-
+logging.basicConfig(filename='events.log', level=logging.INFO, format='%(message)s')
 app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
 credentials = pika.PlainCredentials(confs['APP']['rabbituser'],confs['APP']['rabbitpassword'])
+
+def log_event(event_type, source, metadata, status):
+    event_data = {
+        'event_type': event_type,
+        'source': source,
+        'metadata': metadata,
+        'occurred_at': datetime.utcnow().isoformat(),  # Use UTC timestamp
+        'status': status
+    }
+    logging.info(json.dumps(event_data))
+
 def queue_event(event):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=confs["APP"]["rabbitmq"],
                                                                    port=5672,
@@ -19,7 +30,10 @@ def queue_event(event):
     channel.queue_declare(queue='event_queue')
     channel.basic_publish(exchange='', routing_key='event_queue', body=json.dumps(event))
     connection.close()
-queue_event('{"message":"test"}')
+    metadata={'user': event["user"], 'path': '','id':event["eventid"] }
+    log_event('rabbitmq_message', f'RabbitMQ_{event["source"]}', metadata, 'queued')
+    
+#queue_event('{"message":"test"}')
 class EventResource(Resource):
     @swag_from({
         'responses': {
@@ -36,7 +50,7 @@ class EventResource(Resource):
             }
         }
     })
-    async def post(self):
+    def post(self):
         """
         Queue a new event
         ---
@@ -69,9 +83,10 @@ class EventResource(Resource):
         """
         event = request.get_json()
         queue_event(event)
+        log_event('api_request',f'webclient_{event["source"]}', {'user': event["user"], 'path': '','id':event["eventid"] }, 'queued')
         return jsonify({'message': 'Event queued successfully'})
 
-    async def get(self):
+    def get(self):
         """
         Retrieve events from the database
         ---
@@ -129,7 +144,7 @@ class EventResource(Resource):
             except (json.JSONDecodeError, KeyError) as e:
                 return jsonify({'message': f'Invalid metadata format: {e}'}), 400
 
-        events = query.execute()
+        events =query.execute()
         
         # If no events found, return 404
         if not events:
@@ -147,4 +162,4 @@ class EventResource(Resource):
         return jsonify(events_list)
 api.add_resource(EventResource, '/event')
 
-queue_event('{"message":"test"}')
+#queue_event('{"message":"test"}')

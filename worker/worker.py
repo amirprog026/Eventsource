@@ -1,11 +1,21 @@
-from peewee import Model, CharField, DateTimeField, MySQLDatabase,TextField
+from peewee import Model, CharField, DateTimeField, MySQLDatabase,TextField,AutoField
 import datetime,configparser
 import pika
 import json
 confs=configparser.ConfigParser()
-configs=confs.read()
+confs.read("configs.ini")
+credentials = pika.PlainCredentials(confs['app']['rabbituser'],confs['app']['rabbitpassword'])
+
 # Database setup
-db = MySQLDatabase('events.db')
+dirctaccess= "yes" in confs["DATABASE"]["direct"]
+db = MySQLDatabase(
+    str(confs["DATABASE"]["dbname"]),  # Database name
+    user=str(confs["DATABASE"]["username"]),
+    password=str(confs["DATABASE"]["password"]),
+    host=confs["DATABASE"]['directserver'] if dirctaccess else confs["DATABASE"]['maxscale'],
+    port=int(confs["DATABASE"]["directport"] if dirctaccess else confs["DATABASE"]['maxscale_port'])
+)
+
 
 class JSONField(TextField):
     def db_value(self, value):
@@ -16,7 +26,7 @@ class JSONField(TextField):
             return json.loads(value)
 
 class Event(Model):
-    eventid = CharField(primary_key=True)
+    eventid=AutoField(primary_key=True)
     eventtype = CharField()
     source = CharField()
     user=CharField(max_length=90,default="anonymous")
@@ -27,23 +37,28 @@ class Event(Model):
         database = db
 
 db.connect()
-db.create_tables([Event])
+#db.create_tables([Event])
 
 def save_event_to_db(event):
+    event=dict(event)
     try:
-        Event.create(
-            eventid=event['eventid'],
+        newevent=Event.create(
+            
             eventtype=event['eventtype'],
             source=event['source'],
             metadata=event['metadata'],
             user=event['user'] if event['user'] else "anonymous"
         )
-        print(f"Event {event['eventid']} saved successfully.")
+        print(f"Event {newevent.eventid} saved successfully.")
     except Exception as e:
-        print(f"Failed to save event {event['eventid']}: {e}")
+        print(f"Failed to save event {newevent.eventid}: {e}")
 
 def consume_from_queue():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=confs["app"]["rabbitmq"],
+                                                                   port=5672,
+                                                                   virtual_host='/',
+                                                                   credentials=credentials
+                                                                   ))
     channel = connection.channel()
     channel.queue_declare(queue='event_queue')
 

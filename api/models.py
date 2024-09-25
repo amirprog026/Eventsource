@@ -1,10 +1,7 @@
-from peewee import Model, CharField, DateTimeField, MySQLDatabase,TextField
+from peewee import Model, CharField, DateTimeField, MySQLDatabase,TextField,AutoField
 import datetime,configparser,json
 confs=configparser.ConfigParser()
-confs.read('C:\\Users\\FLW\\Desktop\\event_sourceservice\\api\\config.ini')
-
-
-
+confs.read('config.ini')
 
 class JSONField(TextField):
     def db_value(self, value):
@@ -23,16 +20,15 @@ def make_connection():
     str(dbname),  # Database name
     user=username,
     password=password,
-    host=confs["DATABASE"]['directserver'] if dirctaccess else confs["database"]['maxscaleserver'],
-    port=int(confs["DATABASE"]["directport"] if dirctaccess else confs["database"]['maxscaleport'])
+    host=confs["DATABASE"]['directserver'] if dirctaccess else confs["DATABASE"]['maxscale'],
+    port=int(confs["DATABASE"]["directport"] if dirctaccess else confs["DATABASE"]['maxscale_port'])
 )
     return db
 
 db=make_connection()
-# Assuming MaxScale is running on 'maxscale_host' and listens on port 3306
 
 class Event(Model):
-    eventid = CharField(primary_key=True)
+    eventid = AutoField(primary_key=True)
     eventtype = CharField() #order,action,entrance,...
     source = CharField()
     user=CharField(max_length=90,default="anonymous")
