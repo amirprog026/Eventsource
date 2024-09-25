@@ -3,35 +3,30 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
 import pika,logging
-import json
+import json,secrets
+from hashlib import md5
 logging.basicConfig(filename='events.log', level=logging.INFO, format='%(message)s')
 app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
 credentials = pika.PlainCredentials(confs['APP']['rabbituser'],confs['APP']['rabbitpassword'])
-
-def log_event(event_type, source, metadata, status):
-    event_data = {
-        'event_type': event_type,
-        'source': source,
-        'metadata': metadata,
-        'occurred_at': datetime.utcnow().isoformat(),  # Use UTC timestamp
-        'status': status
-    }
-    logging.info(json.dumps(event_data))
-
-def queue_event(event):
+f= open("/var/log/eventlogs.log","a+")
+def log_event(message):
+    
+    f.write(f"{datetime.datetime.now()} :{message}\n")
+def queue_event(event,trackid):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=confs["APP"]["rabbitmq"],
                                                                    port=5672,
                                                                    virtual_host='/',
                                                                    credentials=credentials
                                                                    ))
+    event["trackid"]=trackid
     channel = connection.channel()
     channel.queue_declare(queue='event_queue')
     channel.basic_publish(exchange='', routing_key='event_queue', body=json.dumps(event))
     connection.close()
-    metadata={'user': event["user"], 'path': '','id':event["eventid"] }
-    log_event('rabbitmq_message', f'RabbitMQ_{event["source"]}', metadata, 'queued')
+    
+    log_event(f'TrackID {event["trackid"]} queued')
     
 #queue_event('{"message":"test"}')
 class EventResource(Resource):
@@ -82,9 +77,14 @@ class EventResource(Resource):
 
         """
         event = request.get_json()
-        queue_event(event)
-        log_event('api_request',f'webclient_{event["source"]}', {'user': event["user"], 'path': '','id':event["eventid"] }, 'queued')
-        return jsonify({'message': 'Event queued successfully'})
+        trackseed=f"{datetime.datetime.now()}_{secrets.token_hex(8)}_{event['source']}"
+        tid=md5(trackseed.encode()).hexdigest()
+        log_event(f'api_request from {event["source"]} TID:{tid}')
+        try:
+          queue_event(event,tid)
+        except Exception as ex:
+            print(f"Problem with Queue service:: {str(ex)}")
+        return jsonify({'message': 'Event queued successfully','trackid':str(tid)})
 
     def get(self):
         """
@@ -161,5 +161,5 @@ class EventResource(Resource):
         
         return jsonify(events_list)
 api.add_resource(EventResource, '/event')
-
+#app.run(host='0.0.0.0')
 #queue_event('{"message":"test"}')
