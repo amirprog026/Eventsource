@@ -1,5 +1,5 @@
 from models import *
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,url_for,render_template
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
 import pika,logging
@@ -161,5 +161,10 @@ class EventResource(Resource):
         
         return jsonify(events_list)
 api.add_resource(EventResource, '/event')
-#app.run(host='0.0.0.0')
+
+@app.route("/panel")
+def panel():
+    return render_template("index.html")
+
+app.run(host='0.0.0.0')
 #queue_event('{"message":"test"}')
