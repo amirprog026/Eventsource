@@ -10,10 +10,35 @@ app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
 credentials = pika.PlainCredentials(confs['APP']['rabbituser'],confs['APP']['rabbitpassword'])
-f= open("/var/log/eventlogs.log","a+")
+trackid_status = {}
+API_LOG_FILE="/var/log/eventlogs.log"
+DB_LOG_FILE="/var/log/worker_eventlogs.log"
+
 def log_event(message):
-    
-    f.write(f"{datetime.datetime.now()} :{message}\n")
+    f= open(API_LOG_FILE,"a+")
+    f.write(f"{datetime.datetime.now()} *{message}\n")
+    f.close()
+def parse_timestamp(line):
+    """Extract timestamp from the log line and return as a datetime object."""
+    if len(line) <2:
+        return None
+    try:
+        timestamp_str = line.split('*')[0].strip()
+        return datetime.datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S.%f')
+    except Exception as ecx:
+        print(ecx)
+        return None
+def read_recent_lines(file_path, time_threshold=datetime.datetime.now() - datetime.timedelta(hours=24)):
+    """Read lines from the log file that are within the last 24 hours."""
+    recent_lines = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            timestamp = parse_timestamp(line)
+            
+            if timestamp and timestamp > time_threshold:
+                recent_lines.append(line)
+    return recent_lines
+
 def queue_event(event,trackid):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=confs["APP"]["rabbitmq"],
                                                                    port=5672,
@@ -24,9 +49,9 @@ def queue_event(event,trackid):
     channel = connection.channel()
     channel.queue_declare(queue='event_queue')
     channel.basic_publish(exchange='', routing_key='event_queue', body=json.dumps(event))
+    log_event(f'TrackID {event["trackid"]} queued')
     connection.close()
     
-    log_event(f'TrackID {event["trackid"]} queued')
     
 #queue_event('{"message":"test"}')
 class EventResource(Resource):
@@ -162,9 +187,60 @@ class EventResource(Resource):
         return jsonify(events_list)
 api.add_resource(EventResource, '/event')
 
+
+
+
+def read_log_file(file_path, last_line_number=0):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        return lines[last_line_number:], len(lines)
+
+@app.route('/track-status')
+def track_status():
+    api_lines = read_recent_lines(API_LOG_FILE)
+    db_lines = read_recent_lines(DB_LOG_FILE)
+    queuedcount=0
+    storedcount=0
+    requestscount=0
+    qids=set()#trackids in queue
+    sids=set()#trackids in DB
+    eventsbysource=Event.count_events_by_source()
+    # Update the status dictionary
+    for line in api_lines:
+        if "queued" in line:
+            trackid = line.split()[-2]
+            qids.add(trackid)
+            queuedcount+=1
+        if "api_request" in line:
+            requestscount+=1
+            
+        
+    for line in db_lines:
+        if "stored" in line:
+            trackid = line.split()[-4]
+            storedcount+=1
+            sids.add(trackid)
+            
+    inqueue=qids.difference(sids)
+    # Prepare the response
+    queued_trackids = {"inqueue": inqueue}
+    data = {
+        
+        "stored_count": storedcount,
+        "queued_count": queuedcount,
+        "inqueue_count":len(inqueue),
+        "inqueue_items":list(inqueue),
+        "counts":eventsbysource,
+        
+    }
+
+    return jsonify(data)
+
+
 @app.route("/panel")
 def panel():
     return render_template("index.html")
 
-app.run(host='0.0.0.0')
+
+#app.run(debug=True,host='0.0.0.0',port='4433')
 #queue_event('{"message":"test"}')

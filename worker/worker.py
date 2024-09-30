@@ -17,8 +17,9 @@ db = MySQLDatabase(
 )
 f= open("/var/log/worker_eventlogs.log","a+")
 def log_event(message):
-    
-    f.write(f"{datetime.datetime.now()} :{message}\n")
+    f= open("/var/log/worker_eventlogs.log","a+")
+    f.write(f"{datetime.datetime.now()} *{message}\n")
+    f.close()
 
 
 class JSONField(TextField):
@@ -53,7 +54,7 @@ def save_event_to_db(event):
             metadata=event['metadata'],
             user=event['user'] if event['user'] else "anonymous"
         )
-        log_event(f" trackid {event['trackid']} stored in DB")
+        log_event(f"trackid {event['trackid']} stored in DB")
         print(f"Event {newevent.eventid} saved successfully.")
     except Exception as e:
         print(f"Failed to save event {newevent.eventid} TID:{event['trackid']}: {e}")

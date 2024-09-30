@@ -7,27 +7,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- loader-->
-  <link href="url_for('static', filename='assets/css/pace.min.css')" rel="stylesheet" />
-  <script src="url_for('static', filename='assets/js/pace.min.js')"></script>
+  <link href="{{url_for('static', filename='assets/css/pace.min.css')}}" rel="stylesheet" />
+  <script src="{{url_for('static', filename='assets/js/pace.min.js')}}"></script>
 
   <!--plugins-->
-  <link href="url_for('static', filename='assets/plugins/simplebar/css/simplebar.css')" rel="stylesheet" />
-  <link href="url_for('static', filename='assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css')" rel="stylesheet" />
-  <link href="url_for('static', filename='assets/plugins/metismenu/css/metisMenu.min.css')" rel="stylesheet" />
+  <link href="{{url_for('static', filename='assets/plugins/simplebar/css/simplebar.css')}}" rel="stylesheet" />
+  <link href="{{url_for('static', filename='assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css')}}" rel="stylesheet" />
+  <link href="{{url_for('static', filename='assets/plugins/metismenu/css/metisMenu.min.css')}}" rel="stylesheet" />
 
   <!-- CSS Files -->
-  <link href="url_for('static', filename='assets/css/bootstrap.min.css')" rel="stylesheet">
-  <link href="url_for('static', filename='assets/css/bootstrap-extended.css')" rel="stylesheet">
-  <link href="url_for('static', filename='assets/css/style.css')" rel="stylesheet">
-  <link href="url_for('static', filename='assets/css/icons.css')" rel="stylesheet">
+  <link href="{{url_for('static', filename='assets/css/bootstrap.min.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='assets/css/bootstrap-extended.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='assets/css/style.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='assets/css/icons.css')}}" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
   <!--Theme Styles-->
-  <link href="url_for('static', filename='assets/css/dark-theme.css')" rel="stylesheet" />
-  <link href="url_for('static', filename='assets/css/semi-dark.css')" rel="stylesheet" />
-  <link href="url_for('static', filename='assets/css/header-colors.css')" rel="stylesheet" />
+  <link href="{{url_for('static', filename='assets/css/dark-theme.css')}}" rel="stylesheet" />
+  <link href="{{url_for('static', filename='assets/css/semi-dark.css')}}" rel="stylesheet" />
+  <link href="{{url_for('static', filename='assets/css/header-colors.css')}}" rel="stylesheet" />
 
-  <title>Fobia - Bootstrap5 Admin Template</title>
+  <title>Monitor Panel</title>
 </head>
 
 <body>
@@ -838,7 +838,7 @@
               <div class="card-body">
                 <div class="d-flex align-items-start gap-2">
                   <div>
-                    <p class="mb-0 fs-6">Total Revenue</p>
+                    <p class="mb-0 fs-6">Total Sales</p>
                   </div>
                   <div class="ms-auto widget-icon-small text-white bg-gradient-purple">
                     <ion-icon name="wallet-outline"></ion-icon>
@@ -858,7 +858,7 @@
               <div class="card-body">
                 <div class="d-flex align-items-start gap-2">
                   <div>
-                    <p class="mb-0 fs-6">Total Customer</p>
+                    <p class="mb-0 fs-6">Total Users</p>
                   </div>
                   <div class="ms-auto widget-icon-small text-white bg-gradient-info">
                     <ion-icon name="people-outline"></ion-icon>
@@ -898,7 +898,7 @@
               <div class="card-body">
                 <div class="d-flex align-items-start gap-2">
                   <div>
-                    <p class="mb-0 fs-6">Conversion Rate</p>
+                    <p class="mb-0 fs-6">Total Events (Last 24H)</p>
                   </div>
                   <div class="ms-auto widget-icon-small text-white bg-gradient-success">
                     <ion-icon name="bar-chart-outline"></ion-icon>
@@ -917,209 +917,13 @@
         <!--end row-->
 
 
-        <div class="row row-cols-1 row-cols-lg-3">
-          <div class="col">
-            <div class="card radius-10 w-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <h6 class="mb-0">Sales by Countries</h6>
-                  <div class="dropdown options ms-auto">
-                    <div class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
-                      <ion-icon name="ellipsis-horizontal-outline" class="md hydrated"></ion-icon>
-                    </div>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Action</a></li>
-                      <li><a class="dropdown-item" href="#">Another action</a></li>
-                      <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="countries-list">
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="country-icon">
-                      <img src="assets/images/icons/usa.png" alt="" width="35">
-                    </div>
-                    <div class="country-name flex-grow-1">
-                      <h5 class="mb-0">$84.5K</h5>
-                      <p class="mb-0 text-secondary">United states</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500"><i class='bx bx-up-arrow-alt'></i><span>25%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="country-icon">
-                      <img src="assets/images/icons/india.png" alt="" width="35">
-                    </div>
-                    <div class="country-name flex-grow-1">
-                      <h5 class="mb-0">$750</h5>
-                      <p class="mb-0 text-secondary">India</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500"><i class='bx bx-up-arrow-alt'></i><span>18%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="country-icon">
-                      <img src="assets/images/icons/china.png" alt="" width="35">
-                    </div>
-                    <div class="country-name flex-grow-1">
-                      <h5 class="mb-0">$38.5</h5>
-                      <p class="mb-0 text-secondary">China</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-danger d-flex gap-1 align-items-center fw-500"><i class='bx bx-down-arrow-alt'></i><span>14%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="country-icon">
-                      <img src="assets/images/icons/russia.png" alt="" width="35">
-                    </div>
-                    <div class="country-name flex-grow-1">
-                      <h5 class="mb-0">$88.0K</h5>
-                      <p class="mb-0 text-secondary">France</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500"><i class='bx bx-up-arrow-alt'></i><span>28%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="country-icon">
-                      <img src="assets/images/icons/australia.png" alt="" width="35">
-                    </div>
-                    <div class="country-name flex-grow-1">
-                      <h5 class="mb-0">$78.3K</h5>
-                      <p class="mb-0 text-secondary">Australia</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-danger d-flex gap-1 align-items-center fw-500"><i class='bx bx-down-arrow-alt'></i><span>16%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="country-icon">
-                      <img src="assets/images/icons/brazil.png" alt="" width="35">
-                    </div>
-                    <div class="country-name flex-grow-1">
-                      <h5 class="mb-0">$10.5K</h5>
-                      <p class="mb-0 text-secondary">Brazil</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500"><i class='bx bx-up-arrow-alt'></i><span>25%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 mb-0">
-                    <div class="country-icon">
-                      <img src="assets/images/icons/UAE.png" alt="" width="35">
-                    </div>
-                    <div class="country-name flex-grow-1">
-                      <h5 class="mb-0">$30.5K</h5>
-                      <p class="mb-0 text-secondary">UAE</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500"><i class='bx bx-up-arrow-alt'></i><span>25%</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card radius-10">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <h6 class="mb-0">Total Earning</h6>
-                  <div class="dropdown options ms-auto">
-                    <div class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
-                      <ion-icon name="ellipsis-horizontal-outline" class="md hydrated"></ion-icon>
-                    </div>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Action</a></li>
-                      <li><a class="dropdown-item" href="#">Another action</a></li>
-                      <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <h2 class="mb-0">68%</h2>
-                  <div class="">
-                    <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500 fs-6"><i class='bx bx-up-arrow-alt'></i><span>25%</span></p>
-                  </div>
-                </div>
-                <div id="chart1"></div>
-                <div class="mt-4">
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="widget-icon-small rounded bg-light-success text-success">
-                      <ion-icon name="wallet-outline"></ion-icon>
-                    </div>
-                    <div class="flex-grow-1">
-                      <h6 class="mb-0">$545.69</h6>
-                      <p class="mb-0 text-secondary">Last Month Sales</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500 fs-6"><i class='bx bx-up-arrow-alt'></i><span>35%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="widget-icon-small rounded bg-light-tiffany text-tiffany">
-                      <ion-icon name="flag-outline"></ion-icon>
-                    </div>
-                    <div class="flex-grow-1">
-                      <h6 class="mb-0">$956.34</h6>
-                      <p class="mb-0 text-secondary">Last Month Sales</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-danger d-flex gap-1 align-items-center fw-500 fs-6"><i class='bx bx-up-arrow-alt'></i><span>45%</span></p>
-                    </div>
-                  </div>
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="widget-icon-small rounded bg-light-danger text-danger">
-                      <ion-icon name="school-outline"></ion-icon>
-                    </div>
-                    <div class="flex-grow-1">
-                      <h6 class="mb-0">$6956.48</h6>
-                      <p class="mb-0 text-secondary">Last Year Sales</p>
-                    </div>
-                    <div class="">
-                      <p class="mb-0 text-success d-flex gap-1 align-items-center fw-500 fs-6"><i class='bx bx-up-arrow-alt'></i><span>66%</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card radius-10 overflow-hidden w-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <h6 class="mb-0">Total Traffic</h6>
-                  <div class="dropdown options ms-auto">
-                    <div class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
-                      <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-                    </div>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                      <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                      <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center font-13 gap-2">
-                  <span class="border px-1 rounded cursor-pointer"><i class="bx bxs-circle me-1 text-tiffany"></i>Cliks</span>
-                  <span class="border px-1 rounded cursor-pointer"><i class="bx bxs-circle me-1 text-success"></i>Views</span>
-                </div>
-                <div id="chart2"></div>
-              </div>
-            </div>
-          </div>
-        </div><!--end row-->
-
 
         <div class="row">
           <div class="col-12 col-xl-8 d-flex">
             <div class="card radius-10 w-100">
               <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
-                  <h6 class="mb-0">Earning Reports</h6>
+                  <h6 class="mb-0">Total Orders</h6>
                   <div class="dropdown options ms-auto">
                     <div class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
                       <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
@@ -1185,20 +989,14 @@
                     <div class="card-body">
                       <div class="d-flex align-items-start gap-2">
                         <div>
-                          <h5 class="mb-0 ">Total Accounts</h5>
+                          <h5 class="mb-0 ">Stored Events</h5>
                         </div>
                         <div class="ms-auto widget-icon-2 text-white bg-info rounded-circle">
                           <ion-icon name="people-outline"></ion-icon>
                         </div>
                       </div>
-                      <div class="">
-                        <h3 class="mb-2">68,542</h3>
-                        <div class="d-flex align-items-center gap-2">
-                           <div class="widget-icon-small bg-light-danger text-danger">
-                            <ion-icon name="arrow-down-outline"></ion-icon>
-                           </div>
-                           <p class="mb-0">+9% last year</p>
-                        </div>
+                      <div class="" id="stored-count">
+              
                       </div>
                       <div id="chart4"></div>
                     </div>
@@ -1206,27 +1004,12 @@
                   <div class="card border shadow-none radius-10 mb-0">
                     <div class="card-body">
                       <div class="d-flex align-items-start gap-2">
-                        <div><p class="mb-0">Disk Space</p></div>
-                        <div class="dropdown options ms-auto">
-                          <div class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
-                            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-                          </div>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                            <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                            <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
-                          </ul>
-                        </div>
+                        <div><p class="mb-0">Queued Events</p></div>
+                    
                       </div>
                       <div class="d-flex align-items-center mt-3">
-                       <div>
-                         <h4 class="mb-3">48GB</h4>
-                         <div class="d-flex align-items-center gap-2">
-                          <div class="widget-icon-small bg-light-danger text-danger">
-                           <ion-icon name="arrow-down-outline"></ion-icon>
-                          </div>
-                          <p class="mb-0">+7% last month</p>
-                       </div>
+                       <div id="queued-count">
+                  
                        </div>
                        <div class="ms-auto">
                          <div class="w_chart" id="chart5" data-percent="60">
@@ -1424,240 +1207,7 @@
 
 
 
-        <div class="card radius-10 w-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <h6 class="mb-0">Recent Orders</h6>
-              <div class="fs-5 ms-auto dropdown">
-                <div class="dropdown-toggle dropdown-toggle-nocaret cursor-pointer" data-bs-toggle="dropdown"><i
-                    class="bi bi-three-dots"></i></div>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Action</a></li>
-                  <li><a class="dropdown-item" href="#">Another action</a></li>
-                  <li>
-                    <hr class="dropdown-divider">
-                  </li>
-                  <li><a class="dropdown-item" href="#">Something else here</a></li>
-                </ul>
-              </div>
-            </div>
-            <div class="table-responsive mt-2">
-              <table class="table align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>#ID</th>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>#89742</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="product-box border">
-                          <img src="assets/images/products/11.png" alt="">
-                        </div>
-                        <div class="product-info">
-                          <h6 class="product-name mb-1">Smart Mobile Phone</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>2</td>
-                    <td>$214</td>
-                    <td><span class="badge bg-success">Completed</span></td>
-                    <td>Apr 8, 2021</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3 fs-6">
-                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="View detail" aria-label="Views">
-                          <ion-icon name="eye-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Edit info" aria-label="Edit">
-                          <ion-icon name="pencil-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Delete" aria-label="Delete">
-                          <ion-icon name="trash-outline"></ion-icon>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#68570</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="product-box border">
-                          <img src="assets/images/products/07.png" alt="">
-                        </div>
-                        <div class="product-info">
-                          <h6 class="product-name mb-1">Sports Time Watch</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>1</td>
-                    <td>$185</td>
-                    <td><span class="badge bg-success">Completed</span></td>
-                    <td>Apr 9, 2021</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3 fs-6">
-                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="View detail" aria-label="Views">
-                          <ion-icon name="eye-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Edit info" aria-label="Edit">
-                          <ion-icon name="pencil-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Delete" aria-label="Delete">
-                          <ion-icon name="trash-outline"></ion-icon>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#38567</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="product-box border">
-                          <img src="assets/images/products/17.png" alt="">
-                        </div>
-                        <div class="product-info">
-                          <h6 class="product-name mb-1">Women Red Heals</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>3</td>
-                    <td>$356</td>
-                    <td><span class="badge bg-danger">Cancelled</span></td>
-                    <td>Apr 10, 2021</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3 fs-6">
-                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="View detail" aria-label="Views">
-                          <ion-icon name="eye-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Edit info" aria-label="Edit">
-                          <ion-icon name="pencil-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Delete" aria-label="Delete">
-                          <ion-icon name="trash-outline"></ion-icon>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#48572</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="product-box border">
-                          <img src="assets/images/products/04.png" alt="">
-                        </div>
-                        <div class="product-info">
-                          <h6 class="product-name mb-1">Yellow Winter Jacket</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>1</td>
-                    <td>$149</td>
-                    <td><span class="badge bg-success">Completed</span></td>
-                    <td>Apr 11, 2021</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3 fs-6">
-                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="View detail" aria-label="Views">
-                          <ion-icon name="eye-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Edit info" aria-label="Edit">
-                          <ion-icon name="pencil-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Delete" aria-label="Delete">
-                          <ion-icon name="trash-outline"></ion-icon>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#96857</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="product-box border">
-                          <img src="assets/images/products/10.png" alt="">
-                        </div>
-                        <div class="product-info">
-                          <h6 class="product-name mb-1">Orange Micro Headphone</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>2</td>
-                    <td>$199</td>
-                    <td><span class="badge bg-danger">Cancelled</span></td>
-                    <td>Apr 15, 2021</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3 fs-6">
-                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="View detail" aria-label="Views">
-                          <ion-icon name="eye-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Edit info" aria-label="Edit">
-                          <ion-icon name="pencil-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Delete" aria-label="Delete">
-                          <ion-icon name="trash-outline"></ion-icon>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#96857</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3">
-                        <div class="product-box border">
-                          <img src="assets/images/products/12.png" alt="">
-                        </div>
-                        <div class="product-info">
-                          <h6 class="product-name mb-1">Pro Samsung Laptop</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>1</td>
-                    <td>$699</td>
-                    <td><span class="badge bg-warning">Pending</span></td>
-                    <td>Apr 18, 2021</td>
-                    <td>
-                      <div class="d-flex align-items-center gap-3 fs-6">
-                        <a href="javascript:;" class="text-primary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="View detail" aria-label="Views">
-                          <ion-icon name="eye-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-warning" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Edit info" aria-label="Edit">
-                          <ion-icon name="pencil-outline"></ion-icon>
-                        </a>
-                        <a href="javascript:;" class="text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                          title="" data-bs-original-title="Delete" aria-label="Delete">
-                          <ion-icon name="trash-outline"></ion-icon>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+
       </div>
       <!-- end page content-->
     </div>
@@ -1753,20 +1303,62 @@
 
 
   <!-- JS Files-->
-  <script src="url_for('static', filename='assets/js/jquery.min.js')"></script>
-  <script src="url_for('static', filename='assets/plugins/simplebar/js/simplebar.min.js')"></script>
-  <script src="url_for('static', filename='assets/plugins/metismenu/js/metisMenu.min.js')"></script>
-  <script src="url_for('static', filename='assets/js/bootstrap.bundle.min.js')"></script>
+  <script src="{{url_for('static', filename='assets/js/jquery.min.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/plugins/simplebar/js/simplebar.min.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/plugins/metismenu/js/metisMenu.min.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <!--plugins-->
-  <script src="url_for('static', filename='assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js')"></script>
-  <script src="url_for('static', filename='assets/plugins/apexcharts-bundle/js/apexcharts.min.js')"></script>
-  <script src="url_for('static', filename='assets/plugins/easyPieChart/jquery.easypiechart.js')"></script>
-  <script src="url_for('static', filename='assets/plugins/chartjs/chart.min.js')"></script>
-  <script src="url_for('static', filename='assets/js/index.js')"></script>
+  <script src="{{url_for('static', filename='assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/plugins/apexcharts-bundle/js/apexcharts.min.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/plugins/easyPieChart/jquery.easypiechart.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/plugins/chartjs/chart.min.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/js/index.js')}}"></script>
   <!-- Main JS-->
-  <script src="url_for('static', filename='assets/js/main.js')"></script>
+  <script src="{{url_for('static', filename='assets/js/main.js')}}"></script>
+  <script>
+    temp=0;
+    function updateTrackIDStatus() {
+        fetch('/track-status')
+            .then(response => response.json())
+            .then(data => {
+                const queuedCount = document.getElementById('queued-count');
+                const storedCount = document.getElementById('stored-count');
+                //const trackidList = document.getElementById('trackid-list');
+                //trackidList.innerHTML = '';  // Clear the list
+                if (temp==0){temp=data;}
+                let dif_stored=data.stored_count-temp.stored_count;
+                let dif_queued=data.queued_count-temp.queued_count;
+                temp=data;
+                queuedCount.innerHTML = ` <h4 class="mb-3" >${data.queued_count}</h4>
+                         <div class="d-flex align-items-center gap-2">
+                          <div class="widget-icon-small bg-light-danger text-danger">
+                           
+                          </div>
+                          <p class="mb-0">${dif_queued} last 5sec</p>
+                       </div>    `;
+                storedCount.innerHTML = `<h3 class="mb-2" >${data.stored_count}</h3>
+                        <div class="d-flex align-items-center gap-2">
+                           <div class="widget-icon-small bg-light-danger text-danger">
+                            
+                           </div>
+                           <p class="mb-0">${dif_stored} last 5sec</p>
+                        </div>`;
 
+                data.queued.forEach(trackid => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = trackid;
+                    listItem.className = 'queued';
+                    //trackidList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching track status:', error));
+    }
+
+    
+    setInterval(updateTrackIDStatus, 5000);
+    updateTrackIDStatus();  // Initial call to populate the list
+</script>
 
 </body>
 
