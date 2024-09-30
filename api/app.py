@@ -11,10 +11,10 @@ logging.basicConfig(filename='events.log', level=logging.INFO, format='%(message
 app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
-app.secret_key="TEST"
+app.secret_key=str(confs['APP']['APPKEY'])
 #csrf = CSRFProtect()
 credentials = pika.PlainCredentials(confs['APP']['rabbituser'],confs['APP']['rabbitpassword'])
-trackid_status = {}
+
 API_LOG_FILE="/var/log/eventlogs.log"
 DB_LOG_FILE="/var/log/worker_eventlogs.log"
 
@@ -42,6 +42,14 @@ def read_recent_lines(file_path, time_threshold=datetime.datetime.now() - dateti
             if timestamp and timestamp > time_threshold:
                 recent_lines.append(line)
     return recent_lines
+
+def fetch_Sale_View_data():
+        sale_event_types = [event.strip() for event in confs.get('events', 'sale_event_types').split(',')]
+        productview_types = [event.strip() for event in confs.get('events', 'productview_types').split(',')]
+        visit_types = [event.strip() for event in confs.get('events', 'visit_types').split(',')]
+        return Event.fetch_events_by_type_last_h(sale_event_types,productview_types,visit_types)
+
+
 
 def queue_event(event,trackid):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=confs["APP"]["rabbitmq"],
@@ -192,9 +200,6 @@ class EventResource(Resource):
         return jsonify(events_list)
 api.add_resource(EventResource, '/event')
 
-
-
-
 def read_log_file(file_path, last_line_number=0):
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -214,6 +219,7 @@ def track_status():
     qids=set()#trackids in queue
     sids=set()#trackids in DB
     eventsbysource=Event.count_events_by_source()
+    
     # Update the status dictionary
     for line in api_lines:
         if "queued" in line:
@@ -248,7 +254,7 @@ def track_status():
 
 @app.route('/manualinsert', methods=['POST'])
 def create_manual_event():
-    TARGET_ENDPOINT="http://194.146.123.166:4433/event"
+    TARGET_ENDPOINT=confs['APP']['BASEURL']+"/event"
     
     # Get form data
     eventtype = request.form.get('eventtype')
@@ -284,6 +290,7 @@ def create_manual_event():
 @app.route("/panel")
 def panel():
     countbysource=Event.count_events_by_source()
+    saleview_data=fetch_Sale_View_data()
     return render_template("index.html",eventscount=countbysource,sumevents=int(sum(countbysource.values())))
 
 
