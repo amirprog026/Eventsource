@@ -298,14 +298,133 @@ var options = {
   
 
 
-
+  async function fetch_countdata_by_hour() {
+    try {
+      const response = await fetch('/track_counts');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      
+      // Extract all values and keys into arrays
+      const values = Object.values(data);
+      const keys = Object.keys(data);
+      console.log('Values:', values);
+      console.log('Keys:', keys);
+  
+      return { keys, values };
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+      return { keys: [], values: [] };
+    }
+  }
+  
+  async function initializeChart() {
+    const { keys, values } = await fetch_countdata_by_hour();
+  
+    var options = {
+      series: [{
+        name: "Stored Events",
+        data: values
+      }],
+      chart: {
+        type: "area",
+        height: 80,
+        toolbar: {
+          show: false
+        },
+        zoom: {
+          enabled: false
+        },
+        dropShadow: {
+          enabled: false,
+          top: 3,
+          left: 14,
+          blur: 4,
+          opacity: 0.12,
+          color: "#32bfff"
+        },
+        sparkline: {
+          enabled: true
+        }
+      },
+      markers: {
+        size: 0,
+        colors: ["#32bfff"],
+        strokeColors: "#fff",
+        strokeWidth: 2,
+        hover: {
+          size: 7
+        }
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "30%",
+          endingShape: "rounded"
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        curve: "smooth"
+      },
+      xaxis: {
+        categories: keys
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          shadeIntensity: 0.5,
+          gradientToColors: ['#32bfff'],
+          inverseColors: false,
+          opacityFrom: 0.5,
+          opacityTo: 0.1,
+        }
+      },
+      colors: ["#32bfff"],
+      tooltip: {
+        theme: "dark",
+        fixed: {
+          enabled: false
+        },
+        x: {
+          show: false
+        },
+        y: {
+          title: {
+            formatter: function() {
+              return ""
+            }
+          }
+        },
+        marker: {
+          show: false
+        }
+      }
+    };
+  
+    // Render the chart
+    var chart = new ApexCharts(document.querySelector("#chart4"), options);
+    chart.render();
+  }
+  
+  // Call the initialize function
+  initializeChart();
   
 
+/*
+const values1 = await fetch_countdata_by_hour();
 // chart 4
 var options = {
     series: [{
-        name: "Total Orders",
-        data: [0, 160, 671, 414, 555, 0]
+        name: "Stored Events",data: await fetch_countdata_by_hour()
+        //data: [0, 160, 671, 414, 555, 0]
     }],
     chart: {
         type: "area",
@@ -393,7 +512,7 @@ var options = {
 
   var chart = new ApexCharts(document.querySelector("#chart4"), options);
   chart.render();
-
+*/
 
 
   // chart 5
@@ -496,7 +615,7 @@ var options = {
       //lineCap: 'round',
       dashArray: 4
     },
-    labels: ['Weekly Status'],
+    labels: ['Convertion Rate'],
   
   }
   

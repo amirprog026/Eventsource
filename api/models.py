@@ -38,37 +38,40 @@ class Event(Model):
     occured_at = DateTimeField(default=datetime.datetime.now)
     metadata = JSONField()
     @classmethod
-    def get_eventcount_lasthours(hours=24):
+    def get_eventcount_lasthours(self,lasthours=24):
         now = datetime.datetime.now()
-        yesterday = now - datetime.timedelta(hours=hours)
+        
+        yesterday = now - datetime.timedelta(hours=int(lasthours))
         query = (Event
-                .select(fn.DATE_TRUNC('hour', Event.occured_at).alias('hour'), fn.COUNT(Event.eventid).alias('count'))
+                .select(fn.DATE_FORMAT(Event.occured_at, '%Y-%m-%d %H:00:00').alias('hour'),
+                        fn.COUNT(Event.eventid).alias('count'))
                 .where(Event.occured_at.between(yesterday, now))
-                .group_by(fn.DATE_TRUNC('hour', Event.occured_at))
-                .order_by(fn.DATE_TRUNC('hour', Event.occured_at)))
+                .group_by(fn.DATE_FORMAT(Event.occured_at, '%Y-%m-%d %H:00:00'))
+                .order_by(fn.DATE_FORMAT(Event.occured_at, '%Y-%m-%d %H:00:00')))
 
         finalresult={}
         for result in query:
-            finalresult[result.hour]=result.count
+            finalresult[str(result.hour)]=result.count
         return finalresult
     @classmethod
-    def get_eventcount_lasthours_classified(classify_by="source"):
+    def get_eventcount_lasthours_classified(self,classify_by="source"):
         now = datetime.datetime.now()
         yesterday = now - datetime.timedelta(hours=24)
         classify_column = Event.source if classify_by == "source" else Event.eventtype
         query = (Event
-                .select(fn.DATE_TRUNC('hour', Event.occured_at).alias('hour'),
+                .select(fn.DATE_FORMAT(Event.occured_at, '%Y-%m-%d %H:00:00').alias('hour'),
                         classify_column.alias(classify_by),  # Alias the column by its name
                         fn.COUNT(Event.eventid).alias('count'))
                 .where(Event.occured_at.between(yesterday, now))
-                .group_by(fn.DATE_TRUNC('hour', Event.occured_at), classify_column)
-                .order_by(fn.DATE_TRUNC('hour', Event.occured_at)))
+                .group_by(fn.DATE_FORMAT(Event.occured_at, '%Y-%m-%d %H:00:00'), classify_column)
+                .order_by(fn.DATE_FORMAT(Event.occured_at, '%Y-%m-%d %H:00:00')))
+
         finalresult={}
         for result in query:
-            finalresult[result.hour]={str(classify_by.capitalize()): getattr(result, classify_by), "Count": result.count}
+            finalresult[str(result.hour)]={str(classify_by.capitalize()): getattr(result, classify_by), "Count": result.count}
         return finalresult
     @classmethod
-    def count_events_by_source()->dict:
+    def count_events_by_source(self)->dict:
         query = (Event
                 .select(Event.source, fn.COUNT(Event.eventid).alias('count'))
                 .group_by(Event.source)

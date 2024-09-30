@@ -1,14 +1,18 @@
 from models import *
+import requests
 from flask import Flask, request, jsonify,url_for,render_template
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
 import pika,logging
 import json,secrets
-from hashlib import md5
+from flask_wtf.csrf import CSRFProtect, validate_csrf, CSRFError
+from hashlib import md5,sha384
 logging.basicConfig(filename='events.log', level=logging.INFO, format='%(message)s')
 app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
+app.secret_key="TEST"
+#csrf = CSRFProtect()
 credentials = pika.PlainCredentials(confs['APP']['rabbituser'],confs['APP']['rabbitpassword'])
 trackid_status = {}
 API_LOG_FILE="/var/log/eventlogs.log"
@@ -70,6 +74,7 @@ class EventResource(Resource):
             }
         }
     })
+    
     def post(self):
         """
         Queue a new event
@@ -110,7 +115,7 @@ class EventResource(Resource):
         except Exception as ex:
             print(f"Problem with Queue service:: {str(ex)}")
         return jsonify({'message': 'Event queued successfully','trackid':str(tid)})
-
+    
     def get(self):
         """
         Retrieve events from the database
@@ -195,6 +200,10 @@ def read_log_file(file_path, last_line_number=0):
         lines = file.readlines()
         return lines[last_line_number:], len(lines)
 
+@app.route('/track_counts')
+def counts():
+    return jsonify (Event.get_eventcount_lasthours())
+
 @app.route('/track-status')
 def track_status():
     api_lines = read_recent_lines(API_LOG_FILE)
@@ -237,10 +246,46 @@ def track_status():
     return jsonify(data)
 
 
+@app.route('/manualinsert', methods=['POST'])
+def create_manual_event():
+    TARGET_ENDPOINT="http://194.146.123.166:4433/event"
+    
+    # Get form data
+    eventtype = request.form.get('eventtype')
+    source = request.form.get('source')
+    user = request.form.get('user', 'anonymous')  # Default to 'anonymous'
+    
+    # Get and parse metadata
+    metadata = request.form.get('metadata')
+    if metadata:
+        try:
+            metadata = json.loads(metadata)
+        except ValueError:
+            return jsonify({"error": "Invalid metadata format"}), 400
+    else:
+        metadata = {}
+    payload = {
+        "eventtype": eventtype,
+        "source": source,
+        "user": user,
+        "metadata": metadata
+    }
+
+    # Send POST request to the target endpoint
+    try:
+        response = requests.post(TARGET_ENDPOINT, json=payload)
+        response.raise_for_status()  # Raise an error for bad responses
+
+        # Return the response from the target endpoint
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/panel")
 def panel():
-    return render_template("index.html")
+    countbysource=Event.count_events_by_source()
+    return render_template("index.html",eventscount=countbysource,sumevents=int(sum(countbysource.values())))
 
 
-#app.run(debug=True,host='0.0.0.0',port='4433')
+app.run(debug=True,host='0.0.0.0',port='4433')
 #queue_event('{"message":"test"}')

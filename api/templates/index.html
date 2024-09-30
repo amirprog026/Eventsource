@@ -26,7 +26,62 @@
   <link href="{{url_for('static', filename='assets/css/dark-theme.css')}}" rel="stylesheet" />
   <link href="{{url_for('static', filename='assets/css/semi-dark.css')}}" rel="stylesheet" />
   <link href="{{url_for('static', filename='assets/css/header-colors.css')}}" rel="stylesheet" />
+  <script>
+    //const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    function addMetadataField() {
+        const metadataContainer = document.getElementById('metadata-container');
+        const div = document.createElement('div');
+        div.className = 'metadata-pair';
+        div.innerHTML = `
+            <input type="text" class="form-control form-control-lg mb-3" name="metadata_key" placeholder="Key" required>
+            <input type="text" class="form-control form-control-lg mb-3" name="metadata_value" placeholder="Value" required>
+            <button type="button" class="btn btn-primary px-4" onclick="removeMetadataField(this)">Remove</button>
+        `;
+        metadataContainer.appendChild(div);
+    }
 
+    function removeMetadataField(button) {
+        const div = button.parentElement;
+        div.remove();
+    }
+
+    async function submitForm(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(event.target);
+        const metadata = {};
+
+        // Collect metadata key-value pairs
+        const keys = formData.getAll('metadata_key');
+        const values = formData.getAll('metadata_value');
+        for (let i = 0; i < keys.length; i++) {
+            metadata[keys[i]] = values[i];
+        }
+
+        // Add metadata to FormData
+        formData.delete('metadata_key'); // Remove key fields from FormData
+        formData.delete('metadata_value'); // Remove value fields from FormData
+        formData.append('metadata', JSON.stringify(metadata)); // Add metadata as JSON string
+
+        // POST request to submit form data
+        try {
+            const response = await fetch('/manualinsert', {
+                method: 'POST',
+                body: formData,
+               
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Success:', result);
+            } else {
+                console.error('Error:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
   <title>Monitor Panel</title>
 </head>
 
@@ -1012,9 +1067,9 @@
                   
                        </div>
                        <div class="ms-auto">
-                         <div class="w_chart" id="chart5" data-percent="60">
-                           <span class="w_percent"></span>
-                         </div>
+                         <div class="w_chart" id="storedchart" data-percent="60">
+                           RabbitMQservice
+                         </div> 
                        </div>
                       </div>
                     </div>
@@ -1051,14 +1106,14 @@
                     <div class="">
                        <div class="mb-4">
                          <h2 class="mb-0">846</h2>
-                         <p class="mb-0">Total Customers</p>
+                         <p class="mb-0">Total Users(Past 24H)</p>
                        </div>
                       <div class="d-flex align-items-start gap-3 mb-3">
                         <div class="widget-icon-small rounded bg-light-purple text-purple">
                           <ion-icon name="gift-outline"></ion-icon>
                         </div>
                         <div>
-                          <p class="mb-1">Current Customers</p>
+                          <p class="mb-1">Anonymous</p>
                           <p class="mb-0 h5">124</p>
                         </div>
                       </div>
@@ -1067,7 +1122,7 @@
                           <ion-icon name="briefcase-outline"></ion-icon>
                         </div>
                         <div>
-                          <p class="mb-1">New Customers</p>
+                          <p class="mb-1">Product View</p>
                           <p class="mb-0 h5">386</p>
                         </div>
                       </div>
@@ -1076,7 +1131,7 @@
                           <ion-icon name="book-outline"></ion-icon>
                         </div>
                         <div>
-                          <p class="mb-1">Retargeted Customers</p>
+                          <p class="mb-1">Visits</p>
                           <p class="mb-0 h5">425</p>
                         </div>
                       </div>
@@ -1090,22 +1145,14 @@
             <div class="card radius-10 w-100">
               <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
-                  <h6 class="mb-0">Sales By Country</h6>
-                  <div class="dropdown options ms-auto">
-                    <div class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
-                      <ion-icon name="ellipsis-horizontal-outline" role="img" class="md hydrated"
-                        aria-label="ellipsis horizontal outline"></ion-icon>
-                    </div>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Action</a></li>
-                      <li><a class="dropdown-item" href="#">Another action</a></li>
-                      <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                  </div>
+                  <h6 class="mb-0">Events By Source</h6>
+            
                 </div>
                 <div class="table-responsive">
                   <table class="table table-borderless align-middle mb-0">
                     <tbody>
+                      {%for item in eventscount.keys() %}
+                      {% set percent = (eventscount[item] / sumevents) * 100 %}
                       <tr>
                         <td>
                           <div class="country-icon">
@@ -1113,89 +1160,20 @@
                           </div>
                         </td>
                         <td>
-                          <div class="country-name h6 mb-0">India</div>
+                          <div class="country-name h6 mb-0">{{item}} </div>
                         </td>
                         <td class="w-100">
                           <div class="progress flex-grow-1" style="height: 5px;">
-                            <div class="progress-bar bg-gradient-info" role="progressbar" style="width: 82%;"></div>
+                            <div class="progress-bar bg-gradient-warning" role="progressbar" style="width: {{percent|int}}%;"></div>
                           </div>
                         </td>
                         <td>
-                          <div class="percent-data">82%</div>
+                          <div class="percent-data">{{eventscount[item]}}</div>
                         </td>
                       </tr>
-                      <tr>
-                        <td>
-                          <div class="country-icon">
-                            <img src="assets/images/icons/usa.png" alt="" width="32">
-                          </div>
-                        </td>
-                        <td>
-                          <div class="country-name h6 mb-0">USA</div>
-                        </td>
-                        <td class="w-100">
-                          <div class="progress flex-grow-1" style="height: 5px;">
-                            <div class="progress-bar bg-gradient-purple" role="progressbar" style="width: 70%;"></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="percent-data">70%</div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="country-icon">
-                            <img src="assets/images/icons/china.png" alt="" width="32">
-                          </div>
-                        </td>
-                        <td>
-                          <div class="country-name h6 mb-0">China</div>
-                        </td>
-                        <td class="w-100">
-                          <div class="progress flex-grow-1" style="height: 5px;">
-                            <div class="progress-bar bg-gradient-success" role="progressbar" style="width: 60%;"></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="percent-data">60%</div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="country-icon">
-                            <img src="assets/images/icons/russia.png" alt="" width="32">
-                          </div>
-                        </td>
-                        <td>
-                          <div class="country-name h6 mb-0">Russia</div>
-                        </td>
-                        <td class="w-100">
-                          <div class="progress flex-grow-1" style="height: 5px;">
-                            <div class="progress-bar bg-gradient-warning" role="progressbar" style="width: 45%;"></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="percent-data">45%</div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="country-icon">
-                            <img src="assets/images/icons/russia.png" alt="" width="32">
-                          </div>
-                        </td>
-                        <td>
-                          <div class="country-name h6 mb-0">Russia</div>
-                        </td>
-                        <td class="w-100">
-                          <div class="progress flex-grow-1" style="height: 5px;">
-                            <div class="progress-bar bg-gradient-danger" role="progressbar" style="width: 30%;"></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="percent-data">30%</div>
-                        </td>
-                      </tr>
+                      {%endfor%}
+
+
                     </tbody>
                   </table>
                 </div>
@@ -1205,7 +1183,84 @@
         </div>
         <!--end row-->
 
+        <div class="row">
+          <div class="col-12 col-lg-12 col-xl-12 d-flex">
+            <div class="card radius-10 w-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <h6 class="mb-0">Custom Event</h6>
+              
+                </div>
+                <div class="row row-cols-1 row-cols-md-2 g-3 align-items-center">
 
+                  <form onsubmit="submitForm(event)">
+                    
+                    <div>
+                        <label for="eventtype">Event Type:</label>
+                        <input class="form-control form-control-lg mb-3" type="text" id="eventtype" name="eventtype" required>
+                    </div>
+                    <div>
+                        <label for="source">Source:</label>
+                        <input class="form-control form-control-lg mb-3" type="text" id="source" name="source" required>
+                    </div>
+                    <div>
+                        <label for="user">User:</label>
+                        <input class="form-control form-control-lg mb-3" type="text" id="user" name="user" value="anonymous">
+                    </div>
+                
+                    <div id="metadata-container">
+                        <h3>Metadata</h3>
+                        <button type="button" class="btn btn-primary px-4" onclick="addMetadataField()">Add Metadata</button>
+                    </div>
+                
+                    <button type="submit" class="btn btn-success px-5 radius-30">Submit</button>
+                </form>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-12 col-xl-6 d-flex">
+            <div class="card radius-10 w-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <h6 class="mb-0">Events By Source</h6>
+            
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-borderless align-middle mb-0">
+                    <tbody>
+                      {%for item in eventscount.keys() %}
+                      {% set percent = (eventscount[item] / sumevents) * 100 %}
+                      <tr>
+                        <td>
+                          <div class="country-icon">
+                            <img src="assets/images/icons/india.png" alt="" width="32">
+                          </div>
+                        </td>
+                        <td>
+                          <div class="country-name h6 mb-0">{{item}} </div>
+                        </td>
+                        <td class="w-100">
+                          <div class="progress flex-grow-1" style="height: 5px;">
+                            <div class="progress-bar bg-gradient-warning" role="progressbar" style="width: {{percent|int}}%;"></div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="percent-data">{{eventscount[item]}}</div>
+                        </td>
+                      </tr>
+                      {%endfor%}
+
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
 
       </div>
@@ -1324,6 +1379,7 @@
             .then(data => {
                 const queuedCount = document.getElementById('queued-count');
                 const storedCount = document.getElementById('stored-count');
+                const storedchart= document.getElementById('storedchart');
                 //const trackidList = document.getElementById('trackid-list');
                 //trackidList.innerHTML = '';  // Clear the list
                 if (temp==0){temp=data;}
@@ -1344,7 +1400,9 @@
                            </div>
                            <p class="mb-0">${dif_stored} last 5sec</p>
                         </div>`;
-
+                  
+                 // storedChart.setAttribute('data-percent', (data.stored_count /data.queued_count)*100);
+                 // storedChart.dataset.percent =(data.stored_count /data.queued_count)*100;
                 data.queued.forEach(trackid => {
                     const listItem = document.createElement('li');
                     listItem.textContent = trackid;
@@ -1358,6 +1416,7 @@
     
     setInterval(updateTrackIDStatus, 5000);
     updateTrackIDStatus();  // Initial call to populate the list
+    
 </script>
 
 </body>
