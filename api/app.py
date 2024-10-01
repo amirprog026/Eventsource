@@ -44,9 +44,9 @@ def read_recent_lines(file_path, time_threshold=datetime.datetime.now() - dateti
     return recent_lines
 
 def fetch_Sale_View_data():
-        sale_event_types = [event.strip() for event in confs.get('events', 'sale_event_types').split(',')]
-        productview_types = [event.strip() for event in confs.get('events', 'productview_types').split(',')]
-        visit_types = [event.strip() for event in confs.get('events', 'visit_types').split(',')]
+        sale_event_types = [event.strip() for event in str(confs['events']['sale_event_types']).split(',')]
+        productview_types = [event.strip() for event in str(confs['events']['productview_types']).split(',')]
+        visit_types = [event.strip() for event in str(confs['events']['visit_types']).split(',')]
         return Event.fetch_events_by_type_last_h(sale_event_types,productview_types,visit_types)
 
 
@@ -153,7 +153,7 @@ class EventResource(Resource):
             required: false
             description: Metadata JSON string (key-value pair)
         """
-        query = Event.select()
+        query = Event.select().limit(20000).order_by(Event.occured_at.desc())
         
         # Filtering by eventid
         eventid = request.args.get('eventid')
@@ -292,7 +292,17 @@ def panel():
     countbysource=Event.count_events_by_source()
     saleview_data=fetch_Sale_View_data()
     return render_template("index.html",eventscount=countbysource,sumevents=int(sum(countbysource.values())))
-
-
+@app.route("/dataview/<platform>")
+def viewplatform(platform):
+    query = Event.select().where(Event.source==platform).limit(40000).order_by(Event.occured_at.desc())
+    events =query.execute()
+    """events_list = [{
+            'eventid': event.eventid,
+            'eventtype': event.eventtype,
+            'source': event.source,
+            'occured_at': event.occured_at.isoformat(),
+            'metadata': event.metadata
+        } for event in events]"""
+    return render_template('dataview.html',events=events,eventscount=Event.count_events_by_source())
 app.run(debug=True,host='0.0.0.0',port='4433')
 #queue_event('{"message":"test"}')
