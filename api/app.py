@@ -7,6 +7,7 @@ import pika,logging
 import json,secrets
 from flask_wtf.csrf import CSRFProtect, validate_csrf, CSRFError
 from hashlib import md5,sha384
+from collections import defaultdict
 logging.basicConfig(filename='events.log', level=logging.INFO, format='%(message)s')
 app = Flask(__name__)
 api = Api(app)
@@ -43,13 +44,29 @@ def read_recent_lines(file_path, time_threshold=datetime.datetime.now() - dateti
                 recent_lines.append(line)
     return recent_lines
 
-def fetch_Sale_View_data():
+def fetch_Sale_View_data(lasthours=24):
+        """sample response : {
+            "saleevents": [],
+            "productviewevents": [],
+            "visitevents": []
+        }
+"""
         sale_event_types = [event.strip() for event in str(confs['events']['sale_event_types']).split(',')]
         productview_types = [event.strip() for event in str(confs['events']['productview_types']).split(',')]
         visit_types = [event.strip() for event in str(confs['events']['visit_types']).split(',')]
-        return Event.fetch_events_by_type_last_h(sale_event_types,productview_types,visit_types)
+        return Event.fetch_events_by_type_last_h(sale_event_types,productview_types,visit_types,lasthours)
 
 
+
+def group_sales_by_day(query_result):
+    """query_result must selected using peewee"""
+    sales_by_day = defaultdict(float)
+    for event in query_result:
+        event_date = event.occured_at.date()  # Get the date part of the occured_at timestamp
+        if str(event.eventtype) in [event.strip() for event in str(confs['events']['sale_event_types']).split(',')]:  
+            amount = event.metadata.get('amount', 0)  
+            sales_by_day[str(event_date)] += float(amount)  
+    return dict(sales_by_day)
 
 def queue_event(event,trackid):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=confs["APP"]["rabbitmq"],
@@ -96,14 +113,13 @@ class EventResource(Resource):
             schema:
               id: Event
               required:
-                - eventid
                 - eventtype
                 - source
                 - metadata
                 - user
               properties:
                 eventid:
-                  type: string
+                  type: Autofield
                 eventtype:
                   type: string
                 source:
@@ -133,10 +149,9 @@ class EventResource(Resource):
         parameters:
           - in: query
             name: eventid
-            type: string
-            user: string
+            type: int
             required: false
-            description: ID of the event to retrieve
+            description: generated automatically
           - in: query
             name: eventtype
             type: string
@@ -147,6 +162,11 @@ class EventResource(Resource):
             type: string
             required: false
             description: Source of the event to retrieve
+          - in: query
+            name: user
+            type: string
+            required: true
+            description: consider 'anonymous' if it is unknown
           - in: query
             name: metadata
             type: string
@@ -291,7 +311,22 @@ def create_manual_event():
 def panel():
     countbysource=Event.count_events_by_source()
     saleview_data=fetch_Sale_View_data()
-    return render_template("index.html",eventscount=countbysource,sumevents=int(sum(countbysource.values())))
+    #counted_data={x:len(saleview_data[x]) for x in saleview_data.keys()} 
+    lastmonthdata=Event.getlast30days_events()
+    _monthsum=sum(int(event.metadata.get('amount', 0)) for event in lastmonthdata)
+    grouped_data=group_sales_by_day(lastmonthdata)
+    userscount=Event.get_data_count_by_user([event.strip() for event in str(confs['events']['sale_event_types']).split(',')])
+    return render_template("index.html",eventscount=countbysource,
+                           sumevents=int(sum(countbysource.values())),
+                           saleviewdata={x:len(saleview_data[x]) if type(saleview_data[x]) is not int else 0 for x in saleview_data.keys()},
+                           salesamount= saleview_data['saleamount'],
+                           saleinmonth=_monthsum,
+                           monthlydata_key=list(grouped_data.keys()),
+                           monthlydata_values=list(grouped_data.values()),
+                           customers=int(userscount[1]),
+                           overalusers=int(userscount[0]),
+                           anonymousevents=int(userscount[2]),
+                           conversionrate=int(userscount[1])//int(userscount[0])*100)
 @app.route("/dataview/<platform>")
 def viewplatform(platform):
     query = Event.select().where(Event.source==platform).limit(40000).order_by(Event.occured_at.desc())
@@ -304,5 +339,5 @@ def viewplatform(platform):
             'metadata': event.metadata
         } for event in events]"""
     return render_template('dataview.html',events=events,eventscount=Event.count_events_by_source())
-app.run(debug=True,host='0.0.0.0',port='4433')
+#app.run(debug=True,host='0.0.0.0',port='4433')
 #queue_event('{"message":"test"}')

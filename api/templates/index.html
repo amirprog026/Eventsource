@@ -472,7 +472,7 @@
               <div class="card-body">
                 <div class="d-flex align-items-start gap-2">
                   <div>
-                    <p class="mb-0 fs-6">Total Sales</p>
+                    <p class="mb-0 fs-6">Total Visits</p>
                   </div>
                   <div class="ms-auto widget-icon-small text-white bg-gradient-purple">
                     <ion-icon name="wallet-outline"></ion-icon>
@@ -480,9 +480,9 @@
                 </div>
                 <div class="d-flex align-items-center mt-3">
                   <div>
-                    <h4 class="mb-0">$92,854</h4>
+                    <h4 class="mb-0">{{saleviewdata['visitevents']}}</h4>
                   </div>
-                  <div class="ms-auto">+6.32%</div>
+                  <div class="ms-auto">0</div>
                 </div>
               </div>
             </div>
@@ -500,9 +500,9 @@
                 </div>
                 <div class="d-flex align-items-center mt-3">
                   <div>
-                    <h4 class="mb-0">48,789</h4>
+                    <h4 class="mb-0">{{overalusers}}</h4>
                   </div>
-                  <div class="ms-auto">+12.45%</div>
+                  <div class="ms-auto">0</div>
                 </div>
               </div>
             </div>
@@ -520,9 +520,9 @@
                 </div>
                 <div class="d-flex align-items-center mt-3">
                   <div>
-                    <h4 class="mb-0">88,234</h4>
+                    <h4 class="mb-0">{{saleviewdata['saleevents']}}</h4>
                   </div>
-                  <div class="ms-auto">+3.12%</div>
+                  <div class="ms-auto">0</div>
                 </div>
               </div>
             </div>
@@ -532,7 +532,7 @@
               <div class="card-body">
                 <div class="d-flex align-items-start gap-2">
                   <div>
-                    <p class="mb-0 fs-6">Total Events (Last 24H)</p>
+                    <p class="mb-0 fs-6">Product Views</p>
                   </div>
                   <div class="ms-auto widget-icon-small text-white bg-gradient-success">
                     <ion-icon name="bar-chart-outline"></ion-icon>
@@ -540,9 +540,9 @@
                 </div>
                 <div class="d-flex align-items-center mt-3">
                   <div>
-                    <h4 class="mb-0">48.76%</h4>
+                    <h4 class="mb-0">{{saleviewdata['productviewevents']}}</h4>
                   </div>
-                  <div class="ms-auto">+8.52%</div>
+                  <div class="ms-auto">0</div>
                 </div>
               </div>
             </div>
@@ -572,7 +572,7 @@
                <div class="row g-4 align-items-center mb-4">
                   <div class="col-12 col-xl-4">
                      <div class="d-flex align-items-center gap-2 mb-3">
-                         <h1 class="mb-0">$856</h1>
+                         <h1 class="mb-0">{{salesamount}} IRT</h1>
                          <p class="mb-0 text-success bg-light-success px-2 rounded py-1">+10.6%</p>
                      </div>
                      <p class="mb-0">In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate.</p>
@@ -587,7 +587,7 @@
                     <ion-icon name="card-outline"></ion-icon>
                   </div>
                   <div class="">
-                    <h4 class="mb-0">$95,286.50</h4>
+                    <h4 class="mb-0">{{salesamount}} IRT</h4>
                     <p class="mb-0 text-secondary">Total Sale(Last 24H)</p>
                   </div>
                 </div>
@@ -597,7 +597,7 @@
                     <ion-icon name="diamond-outline"></ion-icon>
                   </div>
                   <div class="">
-                    <h4 class="mb-0">5000</h4>
+                    <h4 class="mb-0">{{saleviewdata['saleevents']}}</h4>
                     <p class="mb-0 text-secondary">Sales Count (Last 24H)</p>
                   </div>
                 </div>
@@ -607,7 +607,7 @@
                     <ion-icon name="people-circle-outline"></ion-icon>
                   </div>
                   <div class="">
-                    <h4 class="mb-0">$26,498</h4>
+                    <h4 class="mb-0">{{saleinmonth}}</h4>
                     <p class="mb-0 text-secondary">Total Sale(Last 30D)</p>
                   </div>
                 </div>
@@ -685,8 +685,8 @@
                   <div class="col-lg-5 col-xl-5 col-xxl-5">
                     <div class="">
                        <div class="mb-4">
-                         <h2 class="mb-0">846</h2>
-                         <p class="mb-0">Total Users(Past 24H)</p>
+                         <h2 class="mb-0">{{customers}}</h2>
+                         <p class="mb-0">users has purchase event</p>
                        </div>
                       <div class="d-flex align-items-start gap-3 mb-3">
                         <div class="widget-icon-small rounded bg-light-purple text-purple">
@@ -694,7 +694,7 @@
                         </div>
                         <div>
                           <p class="mb-1">Anonymous</p>
-                          <p class="mb-0 h5">124</p>
+                          <p class="mb-0 h5">{{anonymousevents}}</p>
                         </div>
                       </div>
                       <div class="d-flex align-items-start gap-3 mb-3">
@@ -702,8 +702,8 @@
                           <ion-icon name="briefcase-outline"></ion-icon>
                         </div>
                         <div>
-                          <p class="mb-1">Product View</p>
-                          <p class="mb-0 h5">386</p>
+                          <p class="mb-1">All users</p>
+                          <p class="mb-0 h5">{{overalusers}}</p>
                         </div>
                       </div>
                       <div class="d-flex align-items-start gap-3">
@@ -712,7 +712,7 @@
                         </div>
                         <div>
                           <p class="mb-1">Visits</p>
-                          <p class="mb-0 h5">425</p>
+                          <p class="mb-0 h5">0</p>
                         </div>
                       </div>
                     </div>
@@ -900,6 +900,14 @@
 
 
   <!-- JS Files-->
+   <!-- feeding chart-->
+   <script>
+    
+    const keys1= {{monthlydata_key| tojson}};
+    const values1= {{monthlydata_values| tojson}};
+    const conversionrate={{conversionrate| tojson}};
+   </script>
+    <!-- feeding chart-->
   <script src="{{url_for('static', filename='assets/js/jquery.min.js')}}"></script>
   <script src="{{url_for('static', filename='assets/plugins/simplebar/js/simplebar.min.js')}}"></script>
   <script src="{{url_for('static', filename='assets/plugins/metismenu/js/metisMenu.min.js')}}"></script>

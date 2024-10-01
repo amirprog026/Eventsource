@@ -204,7 +204,8 @@ var options = {
 var options = {
     series: [{
         name: "Total Orders",
-        data: [10, 15, 38, 10, 18, 12, 8]
+        data:  values1
+        //data: [10, 15, 38, 10, 18, 12, 8]
     }],
     chart: {
         type: "bar",
@@ -256,7 +257,7 @@ var options = {
         show: false,
     },
     xaxis: {
-        categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"]
+        categories: keys1
     },
     fill: {
 		type: 'gradient',
@@ -610,7 +611,7 @@ var options = {
       }
     },
     colors: ["#fc00ff"],
-    series: [68],
+    series: [coversionrate],
     stroke: {
       //lineCap: 'round',
       dashArray: 4

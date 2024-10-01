@@ -123,8 +123,34 @@ class Event(Model):
             (Event.occured_at.between(yesterday, now))
         )
         event_dict['visitevents'] = list(visit_events_query.dicts())
-
+        event_dict['saleamount']=sum(int(event.metadata.get('amount', 0)) for event in sale_events_query)
         return event_dict
+    @classmethod
+    def getlast30days_events(self):
+        now = datetime.datetime.now()
+        thirty_days_ago = now - datetime.timedelta(days=30)
+        query = (Event
+                .select()
+                .where(Event.occured_at.between(thirty_days_ago, now))
+                .order_by(Event.occured_at))
+        return query
+    @classmethod
+    def get_data_count_by_user(self,purchase_event_types):
+        """return format :: [total_users,users_with_purchase_events,anonymousevents]"""
+
+        
+        total_users = Event.select(Event.user).distinct().count()
+
+       
+        users_with_purchase_events = (
+            Event
+            .select(Event.user)
+            .where(Event.eventtype.in_(purchase_event_types))  # Check for multiple event types
+            .distinct()
+            .count()
+        )
+        anonymousevents=Event.select(Event.user).where(Event.user=="anonymous").count()
+        return [total_users,users_with_purchase_events,anonymousevents]
     class Meta:
         database = db
 
