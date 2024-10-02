@@ -333,6 +333,7 @@ def panel():
 def viewplatform(platform):
     query = Event.select().where(Event.source==platform).limit(40000).order_by(Event.occured_at.desc())
     events =query.execute()
+    platforms=Event.select(Event.source).distinct()
     """events_list = [{
             'eventid': event.eventid,
             'eventtype': event.eventtype,
@@ -340,6 +341,6 @@ def viewplatform(platform):
             'occured_at': event.occured_at.isoformat(),
             'metadata': event.metadata
         } for event in events]"""
-    return render_template('dataview.html',events=events,eventscount=Event.count_events_by_source())
+    return render_template('dataview.html',events=events,eventscount=Event.count_events_by_source(),platforms=platforms)
 #app.run(debug=True,host='0.0.0.0',port='4433')
 #queue_event('{"message":"test"}')
