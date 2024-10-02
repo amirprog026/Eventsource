@@ -35,8 +35,28 @@ function updateTrackIDStatus() {
         .catch(error => console.error('Error fetching track status:', error));
 }
 
+function calculateTrend(values) {
+      if (values.length < 2) {
+        return 0; // No comparison possible if less than 2 items
+    }
+
+    // Get the last value in the array
+    let lastValue = values[values.length - 1];
+
+    // Calculate the average of all previous values
+    let prevValues = values.slice(0, -1);
+    let avgPrev = prevValues.reduce((sum, val) => sum + val, 0) / prevValues.length;
+
+    // Calculate the percent change between the last value and the average
+    let percentChange = ((lastValue - avgPrev) / avgPrev) * 100;
+
+    return percentChange.toFixed(2);  // Returning percent change as a rounded string
+}
+window.onload = (event) => {
     
     setInterval(updateTrackIDStatus, 5000);
     updateTrackIDStatus();  // Initial call to populate the list
-
+    let salechange=document.getElementById('trendpercent');
+     salechange.innerHTML=calculateTrend(values1);
+  };
 
