@@ -104,7 +104,7 @@
       <!--navigation-->
       <ul class="metismenu" id="menu">
         <li>
-          <a href="index.html">
+          <a href="{{url_for('panel')}}">
             <div class="parent-icon">
               <ion-icon name="home-outline"></ion-icon>
             </div>
@@ -119,9 +119,9 @@
             <div class="menu-title">Events</div>
           </a>
           <ul>
-            {%for item in eventscount.keys() %}
-            <li><a href="/dataview/{{item}}">
-                <ion-icon name="ellipse-outline"></ion-icon>{{item}}
+            {%for platform in platforms %}
+            <li><a href="/dataview/{{platform.source}}">
+                <ion-icon name="ellipse-outline"></ion-icon>{{platform.source}}
               </a>
             </li>
             {%endfor%}
@@ -443,23 +443,15 @@
                     <ion-icon name="home-outline"></ion-icon>
                   </a>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">eCommerce</li>
+                <li class="breadcrumb-item active" aria-current="page">Unified Esource Service</li>
               </ol>
             </nav>
           </div>
           <div class="ms-auto">
             <div class="btn-group">
               <button type="button" class="btn btn-outline-primary">Settings</button>
-              <button type="button"
-                class="btn btn-outline-primary split-bg-primary dropdown-toggle dropdown-toggle-split"
-                data-bs-toggle="dropdown"> <span class="visually-hidden">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end"> <a class="dropdown-item"
-                  href="javascript:;">Action</a>
-                <a class="dropdown-item" href="javascript:;">Another action</a>
-                <a class="dropdown-item" href="javascript:;">Something else here</a>
-                <div class="dropdown-divider"></div> <a class="dropdown-item" href="javascript:;">Separated link</a>
-              </div>
+
+ 
             </div>
           </div>
         </div>
@@ -905,7 +897,8 @@
     
     const keys1= {{monthlydata_key| tojson}};
     const values1= {{monthlydata_values| tojson}};
-    const conversionrate={{conversionrate| tojson}};
+    const conversionrate=Math.round({{conversionrate}});
+    
    </script>
     <!-- feeding chart-->
   <script src="{{url_for('static', filename='assets/js/jquery.min.js')}}"></script>
@@ -953,12 +946,7 @@
                   
                  // storedChart.setAttribute('data-percent', (data.stored_count /data.queued_count)*100);
                  // storedChart.dataset.percent =(data.stored_count /data.queued_count)*100;
-                data.queued.forEach(trackid => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = trackid;
-                    listItem.className = 'queued';
-                    //trackidList.appendChild(listItem);
-                });
+       
             })
             .catch(error => console.error('Error fetching track status:', error));
     }

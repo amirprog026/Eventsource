@@ -611,7 +611,7 @@ var options = {
       }
     },
     colors: ["#fc00ff"],
-    series: [coversionrate],
+    series: [conversionrate],
     stroke: {
       //lineCap: 'round',
       dashArray: 4

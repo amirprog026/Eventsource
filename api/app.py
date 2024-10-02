@@ -316,6 +316,7 @@ def panel():
     _monthsum=sum(int(event.metadata.get('amount', 0)) for event in lastmonthdata)
     grouped_data=group_sales_by_day(lastmonthdata)
     userscount=Event.get_data_count_by_user([event.strip() for event in str(confs['events']['sale_event_types']).split(',')])
+    platforms=Event.select(Event.source).distinct()
     return render_template("index.html",eventscount=countbysource,
                            sumevents=int(sum(countbysource.values())),
                            saleviewdata={x:len(saleview_data[x]) if type(saleview_data[x]) is not int else 0 for x in saleview_data.keys()},
@@ -326,7 +327,8 @@ def panel():
                            customers=int(userscount[1]),
                            overalusers=int(userscount[0]),
                            anonymousevents=int(userscount[2]),
-                           conversionrate=int(userscount[1])//int(userscount[0])*100)
+                           conversionrate=int(userscount[1])/int(userscount[0])*100,
+                           platforms=platforms)
 @app.route("/dataview/<platform>")
 def viewplatform(platform):
     query = Event.select().where(Event.source==platform).limit(40000).order_by(Event.occured_at.desc())
