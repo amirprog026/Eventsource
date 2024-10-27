@@ -1,6 +1,6 @@
 from models import *
 import requests
-from flask import Flask, request, jsonify,url_for,render_template
+from flask import Flask, request, jsonify,url_for,render_template,flash,redirect
 from flask_restful import Api, Resource
 from flasgger import Swagger, swag_from
 import pika,logging
@@ -8,6 +8,9 @@ import json,secrets
 from flask_wtf.csrf import CSRFProtect, validate_csrf, CSRFError
 from hashlib import md5,sha384
 from collections import defaultdict
+from auth import AuthService
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from user import User
 logging.basicConfig(filename='events.log', level=logging.INFO, format='%(message)s')
 app = Flask(__name__)
 api = Api(app)
@@ -15,6 +18,9 @@ swagger = Swagger(app)
 app.secret_key=str(confs['APP']['APPKEY'])
 #csrf = CSRFProtect()
 credentials = pika.PlainCredentials(confs['APP']['rabbituser'],confs['APP']['rabbitpassword'])
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Redirects to login page if not logged in
 
 API_LOG_FILE="/var/log/eventlogs.log"
 DB_LOG_FILE="/var/log/worker_eventlogs.log"
@@ -56,8 +62,6 @@ def fetch_Sale_View_data(lasthours=24):
         visit_types = [event.strip() for event in str(confs['events']['visit_types']).split(',')]
         return Event.fetch_events_by_type_last_h(sale_event_types,productview_types,visit_types,lasthours)
 
-
-
 def group_sales_by_day(query_result):
     """query_result must selected using peewee"""
     sales_by_day = defaultdict(float)
@@ -81,7 +85,12 @@ def queue_event(event,trackid):
     log_event(f'TrackID {event["trackid"]} queued')
     connection.close()
     
-    
+ 
+@login_manager.user_loader
+def load_user(user_id):
+
+    return User(user_id)
+  
 #queue_event('{"message":"test"}')
 class EventResource(Resource):
     @swag_from({
@@ -308,6 +317,7 @@ def create_manual_event():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/panel")
+@login_required
 def panel():
     countbysource=Event.count_events_by_source()
     saleview_data=fetch_Sale_View_data()
@@ -344,3 +354,49 @@ def viewplatform(platform):
     return render_template('dataview.html',events=events,eventscount=Event.count_events_by_source(),platforms=platforms)
 #app.run(debug=True,host='0.0.0.0',port='4433')
 #queue_event('{"message":"test"}')
+#from flask import Flask, request, jsonify
+
+
+
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        platform = "esource"
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        try:
+            response = AuthService.register(platform, username, password)
+            flash("Registration successful!", "success")
+            return redirect(url_for('login'))
+        except requests.exceptions.HTTPError as err:
+            flash(f"Registration failed: {err.response.json().get('message')}", "danger")
+    
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        try:
+            response = AuthService.login(username, password)
+            flash("Login successful!", "success")
+            userdata=dict(response)
+            login_user(User(username),True)
+            return redirect(url_for("panel"))
+        except requests.exceptions.HTTPError as err:
+            flash(f"Login failed: {err.response.json().get('message')}", "danger")
+    
+    return render_template('login.html')
+
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    return render_template('login.html')
+
+
