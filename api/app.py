@@ -88,7 +88,6 @@ def queue_event(event,trackid):
  
 @login_manager.user_loader
 def load_user(user_id):
-
     return User(user_id)
   
 #queue_event('{"message":"test"}')
@@ -282,6 +281,7 @@ def track_status():
 
 
 @app.route('/manualinsert', methods=['POST'])
+@login_required
 def create_manual_event():
     TARGET_ENDPOINT=confs['APP']['BASEURL']+"/event"
     
@@ -319,15 +319,17 @@ def create_manual_event():
 @app.route("/panel")
 @login_required
 def panel():
-    countbysource=Event.count_events_by_source()
-    saleview_data=fetch_Sale_View_data()
-    #counted_data={x:len(saleview_data[x]) for x in saleview_data.keys()} 
-    lastmonthdata=Event.getlast30days_events()
-    _monthsum=sum(int(event.metadata.get('amount', 0)) for event in lastmonthdata)
-    grouped_data=group_sales_by_day(lastmonthdata)
-    userscount=Event.get_data_count_by_user([event.strip() for event in str(confs['events']['sale_event_types']).split(',')])
-    platforms=Event.select(Event.source).distinct()
-    return render_template("index.html",eventscount=countbysource,
+    try:
+        db.connect(reuse_if_open=True)
+        countbysource=Event.count_events_by_source()
+        saleview_data=fetch_Sale_View_data()
+        #counted_data={x:len(saleview_data[x]) for x in saleview_data.keys()} 
+        lastmonthdata=Event.getlast30days_events()
+        _monthsum=sum(int(event.metadata.get('amount', 0)) for event in lastmonthdata)
+        grouped_data=group_sales_by_day(lastmonthdata)
+        userscount=Event.get_data_count_by_user([event.strip() for event in str(confs['events']['sale_event_types']).split(',')])
+        platforms=Event.select(Event.source).distinct()
+        return render_template("index.html",eventscount=countbysource,
                            sumevents=int(sum(countbysource.values())),
                            saleviewdata={x:len(saleview_data[x]) if type(saleview_data[x]) is not int else 0 for x in saleview_data.keys()},
                            salesamount= saleview_data['saleamount'],
@@ -339,9 +341,12 @@ def panel():
                            anonymousevents=int(userscount[2]),
                            conversionrate=int(userscount[1])/int(userscount[0])*100,
                            platforms=platforms)
+    except Exception as ex:
+        return jsonify({"message":f"ERROR: {str(ex)}"}), 502
 @app.route("/dataview/<platform>")
+@login_required
 def viewplatform(platform):
-    query = Event.select().where(Event.source==platform).limit(40000).order_by(Event.occured_at.desc())
+    query = Event.select().where(Event.source==platform).limit(20000).order_by(Event.occured_at.desc())
     events =query.execute()
     platforms=Event.select(Event.source).distinct()
     """events_list = [{
@@ -357,11 +362,9 @@ def viewplatform(platform):
 #from flask import Flask, request, jsonify
 
 
-
-
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    return redirect(url_for('login')) # remove this line to handle registration
     if request.method == 'POST':
         platform = "esource"
         username = request.form.get('username')
@@ -378,6 +381,8 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('panel'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -397,6 +402,7 @@ def login():
 @app.route('/logout', methods=['GET'])
 def logout():
     logout_user()
-    return render_template('login.html')
+    return redirect(url_for('login'))
 
 
+app.run()

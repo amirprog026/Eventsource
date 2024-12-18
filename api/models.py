@@ -1,8 +1,13 @@
 from peewee import Model, CharField, DateTimeField, MySQLDatabase,TextField,AutoField,fn
-import datetime,configparser,json
+import datetime,configparser,json,logging
+from playhouse.pool import PooledMySQLDatabase
+
+
+
+
 confs=configparser.ConfigParser()
 confs.read('config.ini')
-
+logging.basicConfig(filename='events.log', level=logging.INFO, format='%(message)s')
 class JSONField(TextField):
     def db_value(self, value):
         return json.dumps(value)
@@ -16,13 +21,17 @@ def make_connection():
     password=confs["DATABASE"]["password"]
     dirctaccess= "yes" in confs["DATABASE"]["direct"]
     
-    db = MySQLDatabase(
-    str(dbname),  # Database name
-    user=username,
-    password=password,
-    host=confs["DATABASE"]['directserver'] if dirctaccess else confs["DATABASE"]['maxscale'],
-    port=int(confs["DATABASE"]["directport"] if dirctaccess else confs["DATABASE"]['maxscale_port'])
-)
+    db = PooledMySQLDatabase(
+        str(dbname),  # Database name
+        user=username,
+        password=password,
+        host=confs["DATABASE"]['directserver'] if dirctaccess else confs["DATABASE"]['maxscale'],
+        port=int(confs["DATABASE"]["directport"] if dirctaccess else confs["DATABASE"]['maxscale_port']),
+        max_connections=310,
+        stale_timeout=100
+    )
+
+
     return db
 
 db=make_connection()
